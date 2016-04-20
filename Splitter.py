@@ -1,5 +1,5 @@
 delimiters = ' \n\r\t'
-detached = '.:,()\"\'[]{}'
+detached = '.:,()\"\'[]{}/*+-^='
 
 
 def is_number(s):
@@ -18,6 +18,7 @@ def imp_split(delimiters, string, detached='', maxsplit=0):
     ans_split = []
 
     for word in pre_split:
+        word = word.replace('"""', '"')
         if is_number(word):
             ans_split.append(word)
             continue
