@@ -1,5 +1,5 @@
-delimiters = ' \n\r\t'
-detached = '.:,()\"\'[]{}/*+-^='
+delimiters = ' \r\t'
+detached = '.:,()\"\'[]{}/*+-^=\n'
 
 
 def is_number(s):
