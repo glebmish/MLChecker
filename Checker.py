@@ -40,24 +40,25 @@ class Checker():
                 else:
                     index_cur = self.unknown
 
-                if window[2] in self.dictionary:
-                    index_next = window[2]
-                else:
-                    index_next = self.unknown
-
                 if window[0] in self.dictionary:
                     index_prev = window[0]
                 else:
                     index_prev = self.unknown
 
-                print 'Indexes: [{}] [{}] [{}]'.format(repr(index_cur), repr(index_next), repr(index_prev))
+                if window[2] in self.dictionary:
+                    index_next = window[2]
+                else:
+                    index_next = self.unknown
 
-                self.counters[index_cur][index_next][index_prev] += 1
+                print 'Indexes: [{}] [{}] [{}]'.format(repr(index_cur), repr(index_prev), repr(index_next))
 
-                print 'Counter: {}'.format(repr(self.counters[index_cur][index_next][index_prev]))
+                self.counters[index_cur][index_prev][index_next] += 1
+
+                print 'Counter: {}'.format(repr(self.counters[index_cur][index_prev][index_next]))
 
                 for i in range(len(dict_delayed)):
                     dict_delayed[i] = (dict_delayed[i][0], dict_delayed[i][1] - 1)
+
                     if dict_delayed[i][1] == 0:
                         self.dictionary.add(dict_delayed[i][0])
                         dict_delayed.pop(i)
@@ -67,6 +68,16 @@ class Checker():
                 print 'Dict:    {}'.format(self.dictionary)
                 print 'Delayed: {}'.format(map(lambda x: x[0], dict_delayed))
                 print '\n\n'
+
+        for index_prev in self.counters[self.unknown]:
+            for index_next in self.counters[self.unknown][index_prev]:
+                self.counters[self.unknown][index_prev][index_next] -= 1
+
+        for index_cur in self.counters:
+            for index_prev in self.counters[index_cur]:
+                for index_next in self.counters[index_cur][index_prev]:
+                    print 'counters[{}][{}][{}]: {}'.format(repr(index_cur), repr(index_prev), repr(index_next),
+                                                            self.counters[index_cur][index_prev][index_next])
 
 
 
