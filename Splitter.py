@@ -8,4 +8,4 @@ def detect_const(text):
 
 def imp_split(text):
     regex_pattern = r'(\.|:|;|,|\(|\)|"|\'|\[|\]|\{|\}|/|\*|\+|\-|\^|=|\s)\s*'
-    return [word for word in re.split(regex_pattern, text) if word not in ' \n\r\t']
+    return [word for word in re.split(regex_pattern, text) if word not in ' \r\t']
