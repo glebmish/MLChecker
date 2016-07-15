@@ -29,7 +29,7 @@ def multidict_cycle(mdict, dimensions, operation):
 
 def print_cell(x, indexes):
     print('counters' + repr(indexes) + ': ' + repr(x))
-    return
+    return x
 
 
 def multidict_cycle_indexes(mdict, dimensions, operation, indexes=[]):
@@ -130,58 +130,56 @@ class Checker:
         # debug print
         multidict_cycle_indexes(self.counters, self.window_len, print_cell)
 
-#TODO: refactor check
     def check(self, filenames):
-        print '\n\n'
+        # debug print
+        print('\n\n')
 
         for each in filenames:
             file = open(each, 'r')
-
             string = file.read()
 
-            words = Splitter.detect_const(Splitter.imp_split(
-                Splitter.delimiters, string, Splitter.detached
-            ))
+            words = Splitter.imp_split(Splitter.detect_const(string))
 
-            window = ['\n', '\n', words[0]]
+            # initialize window
+            window = ['\n'] * (self.window_left + 1)
+            for word in words[:self.window_right]:
+                window.append(word)
+            cur_word_index = self.window_left
 
-            for new_word in words[1:]:
-                window[0] = window[1]
-                window[1] = window[2]
-                window[2] = new_word
+            # process checking for each word
+            for new_word in words[self.window_right:]:
+                # shift window
+                for i in range(0, self.window_len - 1):
+                    window[i] = window[i + 1]
+                window[self.window_len - 1] = new_word
 
-                print 'Window:  [{}, {}, {}]'.format(repr(window[0]), repr(window[1]), repr(window[2]))
+                # debug print
+                print('Window:  ' + repr(window))
 
-                if window[1] in self.dictionary:
-                    index_cur = window[1]
-                else:
-                    index_cur = self.unknown
+                # make indexes (current is first)
+                indexes = [window[cur_word_index] if window[cur_word_index] in self.dictionary else self.unknown]
+                for word in window:
+                    if word is not window[cur_word_index]:
+                        indexes.append(word if word in self.dictionary else self.unknown)
 
-                if window[0] in self.dictionary:
-                    index_prev = window[0]
-                else:
-                    index_prev = self.unknown
+                # debug print
+                print('Indexes: ' + repr(indexes))
 
-                if window[2] in self.dictionary:
-                    index_next = window[2]
-                else:
-                    index_next = self.unknown
-
-                print 'Indexes: [{}] [{}] [{}]'.format(repr(index_cur), repr(index_prev), repr(index_next))
-
+                # actual checking
                 # this part is undiscussed and likely to be wrong
-                if index_cur == self.unknown:
-                    if self.counters[index_cur][index_prev][index_next] == 0:
-                        print 'Word {} can be wrong'.format(window[1])
+                if words[cur_word_index] == self.unknown:
+                    if multidict_operation(self.counters, indexes, id) == 0:
+                        print('Word {} can be wrong'.format(window[cur_word_index]))
                 else:
-                    if self.counters[index_cur][index_prev][index_next] <\
-                            self.counters[self.unknown][index_prev][index_next]:
-                        print 'Word {} can be wrong'.format(window[1])
+                    if multidict_operation(self.counters, indexes, id) < \
+                            multidict_operation(self.counters[self.unknown], indexes[1:], id):
+                        print('Word {} can be wrong'.format(window[cur_word_index]))
                 #
 
-                print
+                # debug print
+                print()
 
 
 cc = Checker()
 cc.train(['Examples_train/easy_ex.py'])
-#cc.check(['Examples_check/easy_ch.py'])
+cc.check(['Examples_check/easy_ch.py'])
