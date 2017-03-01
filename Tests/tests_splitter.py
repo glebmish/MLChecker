@@ -1,3 +1,10 @@
+def load_src(name, fpath):
+    import os, imp
+    p = fpath if os.path.isabs(fpath) \
+        else os.path.join(os.path.dirname(__file__), fpath)
+    return imp.load_source(name, p)
+
+load_src('Splitter', "../Splitter.py")
 from Splitter import *
 
 
